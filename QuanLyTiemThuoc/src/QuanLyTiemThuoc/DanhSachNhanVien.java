@@ -82,9 +82,13 @@ public class DanhSachNhanVien implements IFileIO {
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] p = line.split(";");
-                String cv = p[0].equalsIgnoreCase("DUOCSI") ? "Dược sĩ (" + p[10] + ")" : "Thu ngân (" + p[10] + " ca)";
-                them(new NhanVien(p[1], p[2], p[3], Integer.parseInt(p[4]), p[5], p[6],
-                        p[7], p[8], Double.parseDouble(p[9]), cv, Double.parseDouble(p[11])));
+                if (p.length >= 12 && (p[0].equalsIgnoreCase("DUOCSI") || p[0].equalsIgnoreCase("THUNGAN"))) {
+                    them(new NhanVien(p[1], p[2], p[3], Integer.parseInt(p[4]), p[5], p[6],
+                            p[7], p[8], Double.parseDouble(p[9]), Double.parseDouble(p[11])));
+                } else {
+                    them(new NhanVien(p[0], p[1], p[2], Integer.parseInt(p[3]), p[4], p[5],
+                            p[6], p[7], Double.parseDouble(p[8]), Double.parseDouble(p[9])));
+                }
             }
         } catch (Exception e) {
             System.out.println("Lỗi đọc nhanvien.txt: " + e.getMessage());

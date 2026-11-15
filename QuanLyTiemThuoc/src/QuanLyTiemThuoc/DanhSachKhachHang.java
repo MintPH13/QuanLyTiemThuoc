@@ -82,8 +82,11 @@ public class DanhSachKhachHang implements IFileIO {
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] p = line.split(";");
-                String hang = p[0].equalsIgnoreCase("VIP") ? "VIP (" + p[8] + ")" : "Thường (" + p[8] + "đ)";
-                them(new KhachHang(p[1], p[2], p[3], Integer.parseInt(p[4]), p[5], p[6], Double.parseDouble(p[7]), hang));
+                if (p.length >= 8 && (p[0].equalsIgnoreCase("VIP") || p[0].equalsIgnoreCase("THUONG"))) {
+                    them(new KhachHang(p[1], p[2], p[3], Integer.parseInt(p[4]), p[5], p[6], Double.parseDouble(p[7])));
+                } else {
+                    them(new KhachHang(p[0], p[1], p[2], Integer.parseInt(p[3]), p[4], p[5], Double.parseDouble(p[6])));
+                }
             }
         } catch (Exception e) {
             System.out.println("Lỗi đọc khachhang.txt: " + e.getMessage());
