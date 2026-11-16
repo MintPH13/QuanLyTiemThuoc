@@ -38,8 +38,8 @@ public class HeThong {
             System.out.println("3. Quản lý Khách hàng");
             System.out.println("4. Quản lý Nhập hàng");
             System.out.println("5. Quản lý Hóa đơn & Bán hàng");
-            System.out.println("6. Thống kê & Báo cáo");
-            System.out.println("7. Xuất báo cáo ra trang Web (.html) & Mở trình duyệt");
+            System.out.println("6. Thống kê & Xuất  file báo cáo");
+            System.out.println("7. Xuất báo cáo ra trang Web ");
             System.out.println("0. Lưu dữ liệu & Thoát chương trình");
             System.out.print("Chọn chức năng: ");
 
@@ -58,6 +58,7 @@ public class HeThong {
                 case 6 -> {
                     dst.thongKeNhieuKhoa();
                     QLBH.thongKeDoanhThu(sc, dshd, dspn);
+                    xuat4FileRiengBiet();
                 }
                 case 7 -> xuatBaoCaoHTML();
                 case 0 -> {
@@ -249,6 +250,112 @@ public class HeThong {
         dsctpn.ghiFile();
     }
 
+    // Chức năng số 6: Xuất 4 file 
+    private void xuat4FileRiengBiet() {
+        luuToanBoDuLieu();
+
+        // 1. Xuất file BaoCao_NhanVien.txt
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream("BaoCao_NhanVien.txt"), StandardCharsets.UTF_8))) {
+            String vien = "+-------+----------------------+------+------------+------------+---------------------------+-----------------+";
+            bw.write("=========================================== DANH SÁCH NHÂN VIÊN ===========================================\n");
+            bw.write(vien + "\n");
+            bw.write(String.format("| %-5s | %-20s | %-4s | %-10s | %-10s | %-25s | %-15s |\n",
+                    "Mã NV", "Họ và tên", "GT", "Ngày sinh", "SĐT", "Email", "Tổng lương"));
+            bw.write(vien + "\n");
+
+            for (NhanVien nv : dsnv.getDs()) {
+                bw.write(String.format("| %-5s | %-20s | %-4s | %-10s | %-10s | %-25s | %,11.0f VNĐ |\n",
+                        nv.getManv(), nv.getHoTen(), nv.getGioiTinh(), nv.getNgaySinh(),
+                        nv.getSdt(), nv.getEmail(), nv.tinhLuong()));
+            }
+            bw.write(vien + "\n");
+            bw.write("Tổng số nhân viên: " + dsnv.getSoLuong() + "\n");
+        } catch (IOException e) {
+            System.out.println("Lỗi xuất file BaoCao_NhanVien.txt: " + e.getMessage());
+        }
+
+        // 2. Xuất file BaoCao_KhachHang.txt
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream("BaoCao_KhachHang.txt"), StandardCharsets.UTF_8))) {
+            String vien = "+-------+------------------------+------+------------+------------+----------------------+-------------------+";
+            bw.write("========================================== DANH SÁCH KHÁCH HÀNG ==========================================\n");
+            bw.write(vien + "\n");
+            bw.write(String.format("| %-5s | %-22s | %-4s | %-10s | %-10s | %-20s | %-17s |\n",
+                    "Mã KH", "Họ và tên", "GT", "Ngày sinh", "SĐT", "Địa chỉ", "Tổng chi tiêu"));
+            bw.write(vien + "\n");
+
+            for (KhachHang kh : dskh.getDs()) {
+                bw.write(String.format("| %-5s | %-22s | %-4s | %-10s | %-10s | %-20s | %,13.0f VNĐ |\n",
+                        kh.getMakh(), kh.getHoTen(), kh.getGioiTinh(), kh.getNgaySinh(),
+                        kh.getSdt(), kh.getDiaChi(), kh.getTongChiTieu()));
+            }
+            bw.write(vien + "\n");
+            bw.write("Tổng số khách hàng: " + dskh.getSoLuong() + "\n");
+        } catch (IOException e) {
+            System.out.println("Lỗi xuất file BaoCao_KhachHang.txt: " + e.getMessage());
+        }
+
+        // 3. Xuất file BaoCao_NhapHang.txt
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream("BaoCao_NhapHang.txt"), StandardCharsets.UTF_8))) {
+            String vien = "   +----------+----------+----------------+------------------+";
+            bw.write("============================== BÁO CÁO PHIẾU NHẬP HÀNG ==============================\n\n");
+
+            for (int i = 0; i < dspn.getSoLuong(); i++) {
+                PhieuNhap pn = dspn.getDs()[i];
+                bw.write(String.format("PHIẾU NHẬP: %-6s | Ngày: %-10s | Mã NV: %-5s | Mã NCC: %-6s | TỔNG TIỀN: %,13.0f VNĐ\n",
+                        pn.getMapn(), pn.getNgaynhap(), pn.getManv(), pn.getMancc(), pn.getTongtien()));
+                bw.write(vien + "\n");
+                bw.write(String.format("   | %-8s | %-8s | %-14s | %-16s |\n",
+                        "Mã thuốc", "Số lượng", "Đơn giá nhập", "Thành tiền"));
+                bw.write(vien + "\n");
+
+                for (int j = 0; j < dsctpn.getSoLuong(); j++) {
+                    ChiTietPhieuNhap ct = dsctpn.getDs()[j];
+                    if (ct.getMapn().equalsIgnoreCase(pn.getMapn())) {
+                        bw.write(String.format("   | %-8s | %-8d | %,14.0f | %,16.0f |\n",
+                                ct.getMathuoc(), ct.getSoluong(), ct.getGianhap(), ct.getThanhtien()));
+                    }
+                }
+                bw.write(vien + "\n\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Lỗi xuất file BaoCao_NhapHang.txt: " + e.getMessage());
+        }
+
+        // 4. Xuất file BaoCao_HoaDon.txt
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream("BaoCao_HoaDon.txt"), StandardCharsets.UTF_8))) {
+            String vien = "   +----------+----------+----------------+------------------+";
+            bw.write("============================== BÁO CÁO HÓA ĐƠN BÁN HÀNG ==============================\n\n");
+
+            for (int i = 0; i < dshd.getN(); i++) {
+                HoaDon hd = dshd.getHd()[i];
+                bw.write(String.format("HÓA ĐƠN: %-6s | Ngày: %-10s | Mã NV: %-5s | Mã KH: %-6s | TỔNG TIỀN: %,13.0f VNĐ\n",
+                        hd.getMahd(), hd.getNgaylap(), hd.getManv(), hd.getMakh(), hd.getTongtien()));
+                bw.write(vien + "\n");
+                bw.write(String.format("   | %-8s | %-8s | %-14s | %-16s |\n",
+                        "Mã thuốc", "Số lượng", "Đơn giá bán", "Thành tiền"));
+                bw.write(vien + "\n");
+
+                for (int j = 0; j < dscthd.getSoLuong(); j++) {
+                    ChiTietHoaDon ct = dscthd.getDs()[j];
+                    if (ct.getMahd().equalsIgnoreCase(hd.getMahd())) {
+                        bw.write(String.format("   | %-8s | %-8d | %,14.0f | %,16.0f |\n",
+                                ct.getMathuoc(), ct.getSoluong(), ct.getDongia(), ct.getThanhtien()));
+                    }
+                }
+                bw.write(vien + "\n\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Lỗi xuất file BaoCao_HoaDon.txt: " + e.getMessage());
+        }
+
+        System.out.println("=> Đã xuất thành công 4 file báo cáo kẻ bảng: BaoCao_NhanVien.txt, BaoCao_KhachHang.txt, BaoCao_NhapHang.txt, BaoCao_HoaDon.txt!");
+    }
+
+    // Chức năng số 7: Xuất báo cáo trang Web HTML & tự mở trình duyệt
     private void xuatBaoCaoHTML() {
         luuToanBoDuLieu();
 

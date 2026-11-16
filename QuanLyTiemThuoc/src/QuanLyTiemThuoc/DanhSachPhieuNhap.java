@@ -1,7 +1,9 @@
 package QuanLyTiemThuoc;
 import java.io.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -62,14 +64,29 @@ public class DanhSachPhieuNhap implements IFileIO {
         }
     }
 
-    public double tinhTongChiTheoKhoang(String tuNgay, String denNgay) {
+    // 1. Thống kê theo Ngày
+    public double tinhTongChiTheoNgay(String ngayStr) {
         double tong = 0;
         try {
-            LocalDate d1 = LocalDate.parse(tuNgay, FMT);
-            LocalDate d2 = LocalDate.parse(denNgay, FMT);
+            LocalDate target = LocalDate.parse(ngayStr, FMT);
             for (PhieuNhap pn : ds) {
                 LocalDate d = LocalDate.parse(pn.getNgaynhap(), FMT);
-                if (!d.isBefore(d1) && !d.isAfter(d2)) {
+                if (d.equals(target)) tong += pn.getTongtien();
+            }
+        } catch (Exception e) {}
+        return tong;
+    }
+
+    // 2. Thống kê theo Tuần (tự động tính Thứ 2 -> Chủ Nhật chứa ngày nhập vào)
+    public double tinhTongChiTheoTuan(String ngayTrongTuanStr) {
+        double tong = 0;
+        try {
+            LocalDate date = LocalDate.parse(ngayTrongTuanStr, FMT);
+            LocalDate dauTuan = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            LocalDate cuoiTuan = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+            for (PhieuNhap pn : ds) {
+                LocalDate d = LocalDate.parse(pn.getNgaynhap(), FMT);
+                if (!d.isBefore(dauTuan) && !d.isAfter(cuoiTuan)) {
                     tong += pn.getTongtien();
                 }
             }
@@ -77,6 +94,21 @@ public class DanhSachPhieuNhap implements IFileIO {
         return tong;
     }
 
+    // 3. Thống kê theo Tháng và Năm
+    public double tinhTongChiTheoThang(int thang, int nam) {
+        double tong = 0;
+        for (PhieuNhap pn : ds) {
+            try {
+                LocalDate d = LocalDate.parse(pn.getNgaynhap(), FMT);
+                if (d.getMonthValue() == thang && d.getYear() == nam) {
+                    tong += pn.getTongtien();
+                }
+            } catch (Exception e) {}
+        }
+        return tong;
+    }
+
+    // 4. Thống kê theo Quý và Năm
     public double tinhTongChiTheoQuy(int quy, int nam) {
         double tong = 0;
         for (PhieuNhap pn : ds) {
@@ -84,6 +116,20 @@ public class DanhSachPhieuNhap implements IFileIO {
                 LocalDate d = LocalDate.parse(pn.getNgaynhap(), FMT);
                 int q = (d.getMonthValue() - 1) / 3 + 1;
                 if (d.getYear() == nam && q == quy) {
+                    tong += pn.getTongtien();
+                }
+            } catch (Exception e) {}
+        }
+        return tong;
+    }
+
+    // 5. Thống kê theo Năm
+    public double tinhTongChiTheoNam(int nam) {
+        double tong = 0;
+        for (PhieuNhap pn : ds) {
+            try {
+                LocalDate d = LocalDate.parse(pn.getNgaynhap(), FMT);
+                if (d.getYear() == nam) {
                     tong += pn.getTongtien();
                 }
             } catch (Exception e) {}

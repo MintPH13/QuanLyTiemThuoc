@@ -1,6 +1,8 @@
 package QuanLyTiemThuoc;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Scanner;
 
 public class QLBH {
@@ -69,7 +71,6 @@ public class QLBH {
             ChiTietHoaDon ct1 = new ChiTietHoaDon(mahd, mathuoc, soluong, dongia, thanhtien);
             dsChiTietHoaDon.them(ct1);
 
-            // Cập nhật trừ số lượng thuốc bán ra
             dsThuoc.capNhatSLSP(mathuoc, -soluong);
             tongtien += thanhtien;
         }
@@ -136,7 +137,6 @@ public class QLBH {
             double gn = sp.getGiagoc();
             double tt = sl * gn;
             dsChiTietPhieuNhap.them(new ChiTietPhieuNhap(mapn, mat, sl, gn, tt));
-            // Cập nhật cộng số lượng thuốc vào kho
             dsThuoc.capNhatSLSP(mat, +sl);
             tong += tt;
         }
@@ -145,27 +145,76 @@ public class QLBH {
     }
 
     public static void thongKeDoanhThu(Scanner sc, DanhSachHoaDon dsHoaDon, DanhSachPhieuNhap dsPhieuNhap) {
-        System.out.println("\n1. Thống kê Thu - Chi - Lợi nhuận từ ngày A đến ngày B");
-        System.out.println("2. Thống kê Thu - Chi - Lợi nhuận theo Quý trong năm");
-        System.out.print("Chọn: ");
+        System.out.println("\n===== THỐNG KÊ THU - CHI - LỢI NHUẬN =====");
+        System.out.println("1. Thống kê theo Ngày");
+        System.out.println("2. Thống kê theo Tuần");
+        System.out.println("3. Thống kê theo Tháng");
+        System.out.println("4. Thống kê theo Quý");
+        System.out.println("5. Thống kê theo Năm");
+        System.out.print("Chọn hình thức thống kê: ");
         String opt = sc.nextLine();
-        if (opt.equals("1")) {
-            System.out.print("Nhập ngày bắt đầu (dd/MM/yyyy): ");
-            String tu = sc.nextLine();
-            System.out.print("Nhập ngày kết thúc (dd/MM/yyyy): ");
-            String den = sc.nextLine();
-            double thu = dsHoaDon.tinhTongThuTheoKhoang(tu, den);
-            double chi = dsPhieuNhap.tinhTongChiTheoKhoang(tu, den);
-            System.out.printf("=> Tổng Thu: %,.2f | Tổng Chi: %,.2f | Lợi Nhuận: %,.2f VNĐ\n", thu, chi, thu - chi);
-        } else if (opt.equals("2")) {
-            System.out.print("Nhập năm (VD: 2025 hoặc 2026): ");
-            int nam = Integer.parseInt(sc.nextLine());
-            for (int q = 1; q <= 4; q++) {
-                double thu = dsHoaDon.tinhTongThuTheoQuy(q, nam);
-                double chi = dsPhieuNhap.tinhTongChiTheoQuy(q, nam);
-                System.out.printf(" - Quý %d/%d: Tổng Thu = %,14.2f | Tổng Chi = %,14.2f | Lợi nhuận = %,14.2f VNĐ\n",
-                        q, nam, thu, chi, thu - chi);
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        switch (opt) {
+            case "1" -> {
+                System.out.print("Nhập ngày cần thống kê (dd/MM/yyyy, VD: 15/01/2025): ");
+                String ngay = sc.nextLine();
+                if (!KtraTinhHopLe.isDate(ngay)) {
+                    System.out.println("Ngày không hợp lệ!");
+                    return;
+                }
+                double thu = dsHoaDon.tinhTongThuTheoNgay(ngay);
+                double chi = dsPhieuNhap.tinhTongChiTheoNgay(ngay);
+                System.out.printf("=> Ngày %s: Tổng Thu = %,14.2f | Tổng Chi = %,14.2f | Lợi nhuận = %,14.2f VNĐ\n",
+                        ngay, thu, chi, thu - chi);
             }
+            case "2" -> {
+                System.out.print("Nhập 1 ngày bất kỳ trong tuần cần xem (dd/MM/yyyy): ");
+                String ngay = sc.nextLine();
+                if (!KtraTinhHopLe.isDate(ngay)) {
+                    System.out.println("Ngày không hợp lệ!");
+                    return;
+                }
+                LocalDate d = LocalDate.parse(ngay, fmt);
+                LocalDate dauTuan = d.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                LocalDate cuoiTuan = d.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+                double thu = dsHoaDon.tinhTongThuTheoTuan(ngay);
+                double chi = dsPhieuNhap.tinhTongChiTheoTuan(ngay);
+                System.out.printf("=> Tuần (%s - %s): Tổng Thu = %,14.2f | Tổng Chi = %,14.2f | Lợi nhuận = %,14.2f VNĐ\n",
+                        dauTuan.format(fmt), cuoiTuan.format(fmt), thu, chi, thu - chi);
+            }
+            case "3" -> {
+                System.out.print("Nhập năm cần thống kê (VD: 2025 hoặc 2026): ");
+                int nam = Integer.parseInt(sc.nextLine());
+                System.out.println("--- BẢNG THỐNG KÊ 12 THÁNG NĂM " + nam + " ---");
+                for (int m = 1; m <= 12; m++) {
+                    double thu = dsHoaDon.tinhTongThuTheoThang(m, nam);
+                    double chi = dsPhieuNhap.tinhTongChiTheoThang(m, nam);
+                    System.out.printf(" - Tháng %02d/%d: Tổng Thu = %,14.2f | Tổng Chi = %,14.2f | Lợi nhuận = %,14.2f VNĐ\n",
+                            m, nam, thu, chi, thu - chi);
+                }
+            }
+            case "4" -> {
+                System.out.print("Nhập năm cần thống kê (VD: 2025 hoặc 2026): ");
+                int nam = Integer.parseInt(sc.nextLine());
+                System.out.println("--- BẢNG THỐNG KÊ 4 QUÝ NĂM " + nam + " ---");
+                for (int q = 1; q <= 4; q++) {
+                    double thu = dsHoaDon.tinhTongThuTheoQuy(q, nam);
+                    double chi = dsPhieuNhap.tinhTongChiTheoQuy(q, nam);
+                    System.out.printf(" - Quý %d/%d: Tổng Thu = %,14.2f | Tổng Chi = %,14.2f | Lợi nhuận = %,14.2f VNĐ\n",
+                            q, nam, thu, chi, thu - chi);
+                }
+            }
+            case "5" -> {
+                System.out.print("Nhập năm cần thống kê (VD: 2025 hoặc 2026): ");
+                int nam = Integer.parseInt(sc.nextLine());
+                double thu = dsHoaDon.tinhTongThuTheoNam(nam);
+                double chi = dsPhieuNhap.tinhTongChiTheoNam(nam);
+                System.out.printf("=> Cả năm %d: Tổng Thu = %,14.2f | Tổng Chi = %,14.2f | Lợi nhuận = %,14.2f VNĐ\n",
+                        nam, thu, chi, thu - chi);
+            }
+            default -> System.out.println("Lựa chọn không hợp lệ!");
         }
     }
 }
