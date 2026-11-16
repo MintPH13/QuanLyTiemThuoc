@@ -1,0 +1,12 @@
+KEDON;T01;Augmentin 625mg;Kháng sinh;GSK Anh;Hộp;220000.0;0;12/12/2027;Amoxicillin + Clavulanate;Kháng sinh uống theo đơn bác sĩ
+KEDON;T02;Klacid Forte 500mg;Kháng sinh;Abbott Mỹ;Hộp;310000.0;0;10/11/2027;Clarithromycin;Trị nhiễm khuẩn đường hô hấp
+KEDON;T03;Nexium Mups 40mg;Tiêu hóa;AstraZeneca;Hộp;450000.0;109;05/08/2028;Esomeprazole;Trị trào ngược dạ dày thực quản
+KEDON;T04;Concor 5mg;Tim mạch;Merck Đức;Hộp;185000.0;140;20/09/2028;Bisoprolol;Điều trị tăng huyết áp và suy tim
+KEDON;T05;Glucophage XR 1000mg;Nội tiết;Merck Đức;Hộp;160000.0;130;15/06/2028;Metformin;Điều trị đái tháo đường tuýp 2
+KEDON;T06;Lipitor 20mg;Tim mạch;Pfizer Mỹ;Hộp;390000.0;85;01/12/2027;Atorvastatin;Hạ mỡ máu theo chỉ định
+KHONGKEDON;T07;Panadol Extra;Giảm đau hạ sốt;GSK Anh;Hộp;180000.0;250;01/06/2028;Giảm đau, hạ sốt nhanh
+KHONGKEDON;T08;Efferalgan 500mg;Giảm đau hạ sốt;UPSA Pháp;Hộp;65000.0;300;15/09/2028;Viên sủi giảm đau hạ sốt
+KHONGKEDON;T09;Berocca Performance;Vitamin;Bayer Đức;Tuýp;95000.0;180;22/10/2027;Bổ sung Vitamin nhóm B và C
+KHONGKEDON;T10;Smecta 3g;Tiêu hóa;Ipsen Pháp;Hộp;115000.0;210;30/04/2028;Điều trị tiêu chảy cấp và mạn
+KHONGKEDON;T11;Gaviscon Dual Action;Tiêu hóa;Reckitt Anh;Hộp;175000.0;160;18/07/2028;Giảm triệu chứng ợ nóng, khó tiêu
+KHONGKEDON;T12;Telfast HD 180mg;Chống dị ứng;Sanofi Pháp;Hộp;135000.0;170;12/03/2028;Giảm triệu chứng viêm mũi dị ứng
