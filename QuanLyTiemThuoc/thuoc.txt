@@ -1,6 +1,6 @@
-KEDON;T01;Augmentin 625mg;Kháng sinh;GSK Anh;Hộp;220000.0;120;12/12/2027;Amoxicillin + Clavulanate;Kháng sinh uống theo đơn bác sĩ
-KEDON;T02;Klacid Forte 500mg;Kháng sinh;Abbott Mỹ;Hộp;310000.0;95;10/11/2027;Clarithromycin;Trị nhiễm khuẩn đường hô hấp
-KEDON;T03;Nexium Mups 40mg;Tiêu hóa;AstraZeneca;Hộp;450000.0;110;05/08/2028;Esomeprazole;Trị trào ngược dạ dày thực quản
+KEDON;T01;Augmentin 625mg;Kháng sinh;GSK Anh;Hộp;220000.0;0;12/12/2027;Amoxicillin + Clavulanate;Kháng sinh uống theo đơn bác sĩ
+KEDON;T02;Klacid Forte 500mg;Kháng sinh;Abbott Mỹ;Hộp;310000.0;0;10/11/2027;Clarithromycin;Trị nhiễm khuẩn đường hô hấp
+KEDON;T03;Nexium Mups 40mg;Tiêu hóa;AstraZeneca;Hộp;450000.0;109;05/08/2028;Esomeprazole;Trị trào ngược dạ dày thực quản
 KEDON;T04;Concor 5mg;Tim mạch;Merck Đức;Hộp;185000.0;140;20/09/2028;Bisoprolol;Điều trị tăng huyết áp và suy tim
 KEDON;T05;Glucophage XR 1000mg;Nội tiết;Merck Đức;Hộp;160000.0;130;15/06/2028;Metformin;Điều trị đái tháo đường tuýp 2
 KEDON;T06;Lipitor 20mg;Tim mạch;Pfizer Mỹ;Hộp;390000.0;85;01/12/2027;Atorvastatin;Hạ mỡ máu theo chỉ định

@@ -1,199 +1,29 @@
+// DanhSachHoaDon.java
 package QuanLyTiemThuoc;
+
 import java.io.*;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class DanhSachHoaDon implements IFileIO {
-    private HoaDon[] hd = new HoaDon[0];
-    private Scanner sc = new Scanner(System.in);
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private HoaDon[] ds = new HoaDon[0];
 
-    public HoaDon[] getHd() { return hd; }
-    public int getN() { return hd.length; }
-
-    public void them(HoaDon h) {
-        hd = Arrays.copyOf(hd, hd.length + 1);
-        hd[hd.length - 1] = h;
-    }
-
-    public HoaDon timtheomahd(String mahd) {
-        for (HoaDon h : hd) {
-            if (h.getMahd().equalsIgnoreCase(mahd)) return h;
-        }
-        return null;
-    }
-
-    public void xuat() {
-        if (hd.length == 0) {
-            System.out.println("Danh sách hóa đơn trống!");
-            return;
-        }
-        System.out.println("\n========================= DANH SÁCH HÓA ĐƠN (" + hd.length + " HĐ) =========================");
-        for (HoaDon h : hd) {
-            h.xuat();
-        }
-    }
-
-    public void timtheomahd() {
-        System.out.print("Nhập mã HĐ hoặc mã KH cần tìm: ");
-        String tk = sc.nextLine().toLowerCase();
-        int count = 0;
-        for (HoaDon h : hd) {
-            if (h.getMahd().toLowerCase().contains(tk) || h.getMakh().toLowerCase().contains(tk)) {
-                h.xuat();
-                count++;
-            }
-        }
-        if (count == 0) System.out.println("Không tìm thấy hóa đơn!");
-    }
-
-    public void xoamahd() {
-        System.out.print("Nhập mã HĐ cần xóa: ");
-        String ma = sc.nextLine();
-        int idx = -1;
-        for (int i = 0; i < hd.length; i++) {
-            if (hd[i].getMahd().equalsIgnoreCase(ma)) {
-                idx = i;
-                break;
-            }
-        }
-        if (idx != -1) {
-            for (int i = idx; i < hd.length - 1; i++) hd[i] = hd[i + 1];
-            hd = Arrays.copyOf(hd, hd.length - 1);
-            System.out.println("=> Đã xóa hóa đơn " + ma);
-        } else {
-            System.out.println("Không tìm thấy mã hóa đơn!");
-        }
-    }
-
-    public void suatheomahd() {
-        System.out.print("Nhập mã HĐ cần sửa: ");
-        String ma = sc.nextLine();
-        HoaDon h = timtheomahd(ma);
-        if (h == null) {
-            System.out.println("Không tìm thấy hóa đơn!");
-            return;
-        }
-        System.out.print("Nhập mã NV mới (" + h.getManv() + "): ");
-        String nv = sc.nextLine();
-        if (!nv.trim().isEmpty()) h.setManv(nv);
-        System.out.print("Nhập mã KH mới (" + h.getMakh() + "): ");
-        String kh = sc.nextLine();
-        if (!kh.trim().isEmpty()) h.setMakh(kh);
-        System.out.print("Nhập ngày lập mới (" + h.getNgaylap() + "): ");
-        String nl = sc.nextLine();
-        if (KtraTinhHopLe.isDate(nl)) h.setNgaylap(nl);
-        System.out.println("=> Đã cập nhật hóa đơn!");
-    }
-
-    public void thongketongtien() {
-        double tong = 0;
-        for (HoaDon h : hd) tong += h.getTongtien();
-        System.out.printf("=> Tổng doanh thu toàn bộ %d hóa đơn: %,15.2f VNĐ\n", hd.length, tong);
-    }
-
-    // 1. Thống kê theo Ngày
-    public double tinhTongThuTheoNgay(String ngayStr) {
-        double tong = 0;
-        try {
-            LocalDate target = LocalDate.parse(ngayStr, FMT);
-            for (HoaDon h : hd) {
-                LocalDate d = LocalDate.parse(h.getNgaylap(), FMT);
-                if (d.equals(target)) tong += h.getTongtien();
-            }
-        } catch (Exception e) {}
-        return tong;
-    }
-
-    // 2. Thống kê theo Tuần (nhập 1 ngày bất kỳ, tự tính từ Thứ 2 đến Chủ Nhật tuần đó)
-    public double tinhTongThuTheoTuan(String ngayTrongTuanStr) {
-        double tong = 0;
-        try {
-            LocalDate date = LocalDate.parse(ngayTrongTuanStr, FMT);
-            LocalDate dauTuan = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            LocalDate cuoiTuan = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-            for (HoaDon h : hd) {
-                LocalDate d = LocalDate.parse(h.getNgaylap(), FMT);
-                if (!d.isBefore(dauTuan) && !d.isAfter(cuoiTuan)) {
-                    tong += h.getTongtien();
-                }
-            }
-        } catch (Exception e) {}
-        return tong;
-    }
-
-    // 3. Thống kê theo Tháng và Năm
-    public double tinhTongThuTheoThang(int thang, int nam) {
-        double tong = 0;
-        for (HoaDon h : hd) {
-            try {
-                LocalDate d = LocalDate.parse(h.getNgaylap(), FMT);
-                if (d.getMonthValue() == thang && d.getYear() == nam) {
-                    tong += h.getTongtien();
-                }
-            } catch (Exception e) {}
-        }
-        return tong;
-    }
-
-    // 4. Thống kê theo Quý và Năm
-    public double tinhTongThuTheoQuy(int quy, int nam) {
-        double tong = 0;
-        for (HoaDon h : hd) {
-            try {
-                LocalDate d = LocalDate.parse(h.getNgaylap(), FMT);
-                int q = (d.getMonthValue() - 1) / 3 + 1;
-                if (d.getYear() == nam && q == quy) {
-                    tong += h.getTongtien();
-                }
-            } catch (Exception e) {}
-        }
-        return tong;
-    }
-
-    // 5. Thống kê theo Năm
-    public double tinhTongThuTheoNam(int nam) {
-        double tong = 0;
-        for (HoaDon h : hd) {
-            try {
-                LocalDate d = LocalDate.parse(h.getNgaylap(), FMT);
-                if (d.getYear() == nam) {
-                    tong += h.getTongtien();
-                }
-            } catch (Exception e) {}
-        }
-        return tong;
-    }
-
-    public double tinhTongTheoKhachHangVaNam(String makh, int nam) {
-        double tong = 0;
-        for (HoaDon h : hd) {
-            try {
-                LocalDate d = LocalDate.parse(h.getNgaylap(), FMT);
-                if (h.getMakh().equalsIgnoreCase(makh) && d.getYear() == nam) {
-                    tong += h.getTongtien();
-                }
-            } catch (Exception e) {}
-        }
-        return tong;
-    }
+    public HoaDon[] getDs() { return ds; }
+    public void setDs(HoaDon[] ds) { this.ds = ds; }
+    public int getSoLuong() { return ds.length; }
 
     @Override
     public void docFile() {
         File f = new File("hoadon.txt");
         if (!f.exists()) f = new File("data/hoadon.txt");
         if (!f.exists()) return;
-        hd = new HoaDon[0];
+        ds = new HoaDon[0];
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] p = line.split(";");
-                them(new HoaDon(p[0], p[1], p[2], p[3], Double.parseDouble(p[4])));
+                ds = Arrays.copyOf(ds, ds.length + 1);
+                ds[ds.length - 1] = new HoaDon(p[0], p[1], p[2], p[3], Double.parseDouble(p[4]));
             }
         } catch (Exception e) {
             System.out.println("Lỗi đọc hoadon.txt: " + e.getMessage());
@@ -203,7 +33,7 @@ public class DanhSachHoaDon implements IFileIO {
     @Override
     public void ghiFile() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("hoadon.txt"))) {
-            for (HoaDon h : hd) {
+            for (HoaDon h : ds) {
                 bw.write(h.toFileString());
                 bw.newLine();
             }
